@@ -1,1 +1,1 @@
-web: gunicorn lab4.wsgigit add .
+web: gunicorn lab4.wsgi
