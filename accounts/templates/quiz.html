@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Викторина по компьютерному железу</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <a href="{% url 'home' %}" style="display:inline-block; margin-bottom:15px; color: #007bff;">🏠 Вернуться на главную</a>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: left;
+        }
+
+        h2 {
+            color: #333;
+            text-align: center;
+        }
+
+        .correct {
+            color: green;
+        }
+
+        form {
+            text-align: left;
+            margin-top: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            margin-top: 5px;
+        }
+
+        button {
+            background: #28a745;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background: #218838;
+        }
+
+        .quiz-result {
+            margin-top: 20px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h3>📷 Выберите изображение для скачивания:</h3>
+    <img id="quizImage" src="" alt="Изображение викторины" width="300"><br>
+    <button onclick="downloadRandomImage()">📥 Скачать случайное изображение</button>
+    <h2>📝 Викторина по компьютерному железу</h2>
+    <form id="quizForm">
+
+        <div class="form-group">
+            <label>1. Какой процессор выпускает компания AMD?</label>
+            <select name="q1">
+                <option value="Intel">Intel</option>
+                <option value="Ryzen">Ryzen</option>
+                <option value="Pentium">Pentium</option>
+                <option value="Xeon">Xeon</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>2. Какой тип оперативной памяти быстрее?</label>
+            <input type="text" name="q2" placeholder="Введите ответ">
+        </div>
+
+        <div class="form-group">
+            <label>3. Что обозначает аббревиатура SSD?</label>
+            <input type="checkbox" name="q3" value="Super Storage Device"> Super Storage Device<br>
+            <input type="checkbox" name="q3" value="Solid State Drive"> Solid State Drive<br>
+            <input type="checkbox" name="q3" value="Smart System Disk"> Smart System Disk<br>
+        </div>
+
+        <div class="form-group">
+            <label>4. Какой из разъемов предназначен для подключения видеокарты?</label>
+            <select name="q4">
+                <option value="PCIe">PCIe</option>
+                <option value="SATA">SATA</option>
+                <option value="USB">USB</option>
+                <option value="HDMI">HDMI</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>5. Какая технология используется в современных SSD?</label>
+            <input type="text" name="q5" placeholder="Введите ответ">
+        </div>
+
+        <div class="form-group">
+            <label>6. Какая компания разработала процессоры серии Pentium?</label>
+            <input type="checkbox" name="q6" value="AMD"> AMD<br>
+            <input type="checkbox" name="q6" value="Apple"> Apple<br>
+            <input type="checkbox" name="q6" value="Intel"> Intel<br>
+        </div>
+
+        <div class="form-group">
+            <label>7. Какой блок компьютера отвечает за преобразование переменного тока в постоянный?</label>
+            <input type="text" name="q7" placeholder="Введите ответ">
+        </div>
+
+        <div class="form-group">
+            <label>8. Какая компания разработала видеокарты GeForce?</label>
+            <select name="q8">
+                <option value="Intel">Intel</option>
+                <option value="AMD">AMD</option>
+                <option value="NVIDIA">NVIDIA</option>
+                <option value="Samsung">Samsung</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label>9. Какая технология используется для ускорения загрузки игр на SSD?</label>
+            <input type="text" name="q9" placeholder="Введите ответ">
+        </div>
+
+        <div class="form-group">
+            <label>10. Какая память используется в видеокартах?</label>
+            <input type="checkbox" name="q10" value="DDR4"> DDR4<br>
+            <input type="checkbox" name="q10" value="GDDR6"> GDDR6<br>
+            <input type="checkbox" name="q10" value="SSD"> SSD<br>
+        </div>
+
+        <button type="button" onclick="checkResults()">✅ Проверить результаты</button>
+        <button type="button" onclick="saveResultsToExcel()">📥 Сохранить результаты</button>
+        <div id="quizResult"></div>
+    </form>
+</div>
+
+
+<script>
+
+    function downloadRandomImage() {
+        fetch('C:\\Users\\Zhalgas\\Desktop\\Needs\\Python\\Python\\CHKV\\LAB\\lab2')
+            .then(response => response.json())
+            .then(data => {
+                const img = document.getElementById("quizImage");
+                img.src = data.imagePath;
+
+                const link = document.createElement("a");
+                link.href = data.imagePath;
+                link.download = data.imageName;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            })
+            .catch(error => console.error('Ошибка загрузки изображения:', error));
+
+        const correctAnswers = {
+            q1: "Ryzen",
+            q2: "DDR5",
+            q3: "Solid State Drive",
+            q4: "PCIe",
+            q5: "NVMe",
+            q6: "Intel",
+            q7: "Блок питания",
+            q8: "NVIDIA",
+            q9: "DirectStorage",
+            q10: "GDDR6"
+        };
+
+        function checkResults() {
+            let score = 0;
+            let totalQuestions = 10;
+            let resultsHTML = "<strong>Результаты:</strong><br>";
+
+            for (let key in correctAnswers) {
+                let userAnswer = document.querySelector(`[name="${key}"]`).value.trim();
+                if (userAnswer.toLowerCase() === correctAnswers[key].toLowerCase()) {
+                    score++;
+                    resultsHTML += `<span style='color:green'>✔ ${key}: Верно (${userAnswer})</span><br>`;
+                } else {
+                    resultsHTML += `<span style='color:red'>❌ ${key}: Неверно (${userAnswer}). Правильный ответ: ${correctAnswers[key]}</span><br>`;
+                }
+            }
+
+            document.getElementById("quizResult").innerHTML = `✅ Ваш результат: ${score} из ${totalQuestions} <br><br>` + resultsHTML;
+        }
+
+        function saveResultsToExcel() {
+            let form = document.getElementById("quizForm");
+            let data = [["Вопрос", "Ответ пользователя", "Правильный ответ"]];
+            let formData = new FormData(form);
+
+            formData.forEach((value, key) => {
+                data.push([key, value, correctAnswers[key] || ""]);
+            });
+
+            let ws = XLSX.utils.aoa_to_sheet(data);
+            let wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Результаты");
+            XLSX.writeFile(wb, "quiz_results.xlsx");
+        }
+    }
+</script>
+</body>
+</html>
